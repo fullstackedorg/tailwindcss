@@ -43,6 +43,16 @@ async function loadStylesheet(id: string, base: string) {
             content: await fs.promises.readFile(path.join(tailwindcssBaseDir, "index.css"), "utf-8")
         };
     } else if (
+        id === "tailwindcss/preflight" ||
+        id === "tailwindcss/preflight.css" ||
+        id === "./preflight.css"
+    ) {
+        return {
+            path: "virtual:tailwindcss/preflight.css",
+            base,
+            content: await fs.promises.readFile(path.join(tailwindcssBaseDir, "preflight.css"), "utf-8")
+        };
+    } else if (
         id === "tailwindcss/theme" ||
         id === "tailwindcss/theme.css" ||
         id === "./theme.css"
@@ -67,14 +77,16 @@ async function loadStylesheet(id: string, base: string) {
     throw new Error(`The browser build does not support @import for "${id}"`);
 }
 
-export async function build(outfile: string, files: string[]) {
+export async function build(outfile: string, files: string[], skipLightning: boolean = false) {
     const contents = await Promise.all(files.map(file => fs.promises.readFile(file, "utf-8")));
     const candidate = contents.map(content => extract(content)).flat();
     const compiler = await compile("@import 'tailwindcss';", { loadStylesheet });
     const css = compiler.build(candidate);
-    const result = transform({
-        filename: "input.css",
-        code: new TextEncoder().encode(css)
-    })
-    return fs.promises.writeFile(outfile, result.code);
+    const result = skipLightning
+        ? css
+        : transform({
+            filename: "input.css",
+            code: new TextEncoder().encode(css)
+        }).code
+    return fs.promises.writeFile(outfile, result);
 }
