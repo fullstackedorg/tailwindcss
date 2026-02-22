@@ -77,10 +77,11 @@ async function loadStylesheet(id: string, base: string) {
     throw new Error(`The browser build does not support @import for "${id}"`);
 }
 
-export async function build(outfile: string, files: string[], skipLightning: boolean = false) {
+export async function build(entryfile: string, outfile: string, files: string[], skipLightning: boolean = false) {
     const contents = await Promise.all(files.map(file => fs.promises.readFile(file, "utf-8")));
     const candidate = contents.map(content => extract(content)).flat();
-    const compiler = await compile("@import 'tailwindcss';", { loadStylesheet });
+    const entry = await fs.promises.readFile(entryfile, "utf-8");
+    const compiler = await compile(entry, { loadStylesheet });
     const css = compiler.build(candidate);
     const result = skipLightning
         ? css
