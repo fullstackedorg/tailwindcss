@@ -2,10 +2,10 @@
     "name": "@fullstacked/builder-tailwindcss",
     "version": "0.0.0",
     "dependencies": {
-        "@types/node": "^25.3.0",
-        "lightningcss-wasm": "^1.31.1",
-        "oxide-wasm": "^0.1.0",
-        "tailwindcss": "^4.2.0"
+        "@types/node": "^25.6.0",
+        "lightningcss-wasm": "^1.32.0",
+        "oxide-wasm": "^0.1.1",
+        "tailwindcss": "^4.2.4"
     },
     "type": "module",
     "scripts": {
