@@ -36,7 +36,7 @@ export function initialize(opts?: InitializeOpts) {
                 oxide: oxide(fs.promises.readFile(oxidePath)),
                 lightningcss: lightningcss(lightningcssPath),
                 tailwindcss: tailwindcssPath,
-                baseDirectory: opts?.baseDirectory || ".",
+                baseDirectory: opts?.baseDirectory || process.cwd(),
                 skipLightning: opts?.skipLightning
             };
 
@@ -137,9 +137,9 @@ export async function compileTailwind(
     const result = init.skipLightning
         ? css
         : transform({
-              filename: "input.css",
-              code: new TextEncoder().encode(css)
-          }).code;
+            filename: "input.css",
+            code: new TextEncoder().encode(css)
+        }).code;
 
     return typeof result === "string"
         ? result
@@ -180,7 +180,8 @@ export async function build(
 export const pluginTailwindcss = {
     data: {
         name: "tailwindcss",
-        filter: "^tailwindcss$"
+        filter: "tailwindcss",
+        ext: ["css"]
     },
     callback: tailwindBuilder
 };
