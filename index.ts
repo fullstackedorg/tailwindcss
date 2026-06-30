@@ -114,12 +114,6 @@ export async function compileTailwind(
 ): Promise<string> {
     entryfile = path.join(init.baseDirectory, entryfile);
 
-    try {
-        await fs.promises.stat(entryfile);
-    } catch (e) {
-        return "";
-    }
-
     const entry = await fs.promises.readFile(entryfile, "utf-8");
     const contents = await Promise.all(
         files.map((file) =>
@@ -129,10 +123,6 @@ export async function compileTailwind(
     const candidate = contents.map((content) => extract(content)).flat();
     const compiler = await compile(entry, { loadStylesheet });
     const css = compiler.build(candidate);
-
-    if (css.trim() === "") {
-        return "";
-    }
 
     const result = init.skipLightning
         ? css
@@ -154,11 +144,16 @@ export async function tailwindBuilder(params: {
 
     initializeOptions?: InitializeOpts;
 }) {
+
+    if (params.sources.length == 0 || params.resolved.length == 0) {
+        return []
+    }
+
     const sources = params.sources.filter((s) => !s.endsWith(".css"));
     await initialize(params.initializeOptions);
     const css = await compileTailwind(params.resolved.at(0).importer, sources);
-    if (!css) return null;
     const basename = path.basename(params.resolved.at(0).importer);
+
     return [
         {
             outputName: basename + ".tailwind.css",
