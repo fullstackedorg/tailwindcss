@@ -5,7 +5,7 @@
         "@types/node": "^26.0.1",
         "lightningcss-wasm": "^1.32.0",
         "oxide-wasm": "^0.1.1",
-        "tailwindcss": "^4.3.1"
+        "tailwindcss": "^4.3.2"
     },
     "type": "module",
     "scripts": {
