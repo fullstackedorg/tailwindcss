@@ -127,9 +127,9 @@ export async function compileTailwind(
     const result = init.skipLightning
         ? css
         : transform({
-            filename: "input.css",
-            code: new TextEncoder().encode(css)
-        }).code;
+              filename: "input.css",
+              code: new TextEncoder().encode(css)
+          }).code;
 
     return typeof result === "string"
         ? result
@@ -144,9 +144,8 @@ export async function tailwindBuilder(params: {
 
     initializeOptions?: InitializeOpts;
 }) {
-
     if (params.sources.length == 0 || params.resolved.length == 0) {
-        return []
+        return [];
     }
 
     const sources = params.sources.filter((s) => !s.endsWith(".css"));
