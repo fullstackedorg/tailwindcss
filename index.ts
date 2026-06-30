@@ -8,13 +8,17 @@ let init: {
     oxide: Promise<void>;
     lightningcss: Promise<void>;
     tailwindcss: string
+    baseDirectory: string
+    skipLightning: boolean
 } = null;
 let initPromise: Promise<void> = null
 
 type InitializeOpts = {
     oxide: string,
     tailwindcss: string,
-    lightningcss: string
+    lightningcss: string,
+    baseDirectory?: string
+    skipLightning?: boolean
 };
 
 export function initialize(opts?: InitializeOpts) {
@@ -24,10 +28,12 @@ export function initialize(opts?: InitializeOpts) {
             const lightningcssPath = opts?.lightningcss || "node_modules/lightningcss-wasm/lightningcss_node.wasm"
             const tailwindcssPath = opts?.tailwindcss || "node_modules/tailwindcss"
 
-            const locations = {
+            const locations: typeof init = {
                 oxide: oxide(fs.promises.readFile(oxidePath)),
                 lightningcss: lightningcss(lightningcssPath),
                 tailwindcss: tailwindcssPath,
+                baseDirectory: opts?.baseDirectory || ".",
+                skipLightning: opts?.skipLightning
             }
 
             await Promise.all([
@@ -92,13 +98,15 @@ async function loadStylesheet(
     throw new Error(`The browser build does not support @import for "${id}"`);
 }
 
-export async function compileTailwind(entryfile: string, files: string[], skipLightning: boolean = false): Promise<string> {
+export async function compileTailwind(entryfile: string, files: string[]): Promise<string> {
+    entryfile = path.join(init.baseDirectory, entryfile);
+
     try {
         await fs.promises.stat(entryfile);
     } catch (e) { return ""; }
 
     const entry = await fs.promises.readFile(entryfile, "utf-8");
-    const contents = await Promise.all(files.map(file => fs.promises.readFile(file, "utf-8")));
+    const contents = await Promise.all(files.map(file => fs.promises.readFile(path.join(init.baseDirectory, file), "utf-8")));
     const candidate = contents.map(content => extract(content)).flat();
     const compiler = await compile(entry, { loadStylesheet });
     const css = compiler.build(candidate);
@@ -107,7 +115,7 @@ export async function compileTailwind(entryfile: string, files: string[], skipLi
         return "";
     }
 
-    const result = skipLightning
+    const result = init.skipLightning
         ? css
         : transform({
             filename: "input.css",
@@ -123,12 +131,11 @@ export async function tailwindBuilder(params: {
     }[];
     sources: string[];
 
-    skipLightning?: boolean;
     initializeOptions?: InitializeOpts;
 }) {
     const sources = params.sources.filter(s => !s.endsWith(".css"));
     await initialize(params.initializeOptions);
-    const css = await compileTailwind(params.resolved.at(0).importer, sources, params.skipLightning);
+    const css = await compileTailwind(params.resolved.at(0).importer, sources);
     if (!css) return null;
     const basename = path.basename(params.resolved.at(0).importer);
     return [{
@@ -137,8 +144,8 @@ export async function tailwindBuilder(params: {
     }];
 }
 
-export async function build(entryfile: string, outfile: string, files: string[], skipLightning: boolean = false) {
-    const css = await compileTailwind(entryfile, files, skipLightning);
+export async function build(entryfile: string, outfile: string, files: string[]) {
+    const css = await compileTailwind(entryfile, files);
     if (!css) return;
     return fs.promises.writeFile(outfile, css);
 }
