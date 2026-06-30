@@ -180,7 +180,7 @@ export async function build(
 export const pluginTailwindcss = {
     data: {
         name: "tailwindcss",
-        filter: "tailwindcss"
+        filter: "^tailwindcss$"
     },
     callback: tailwindBuilder
 };
