@@ -1,6 +1,7 @@
 {
     "name": "@fullstacked/tailwindcss",
-    "version": "4.3.2",
+    "version": "4.3.2-patch.0",
+    "main": "index.js",
     "scripts": {
         "build": "esbuild --outfile=index.js index.ts"
     },
