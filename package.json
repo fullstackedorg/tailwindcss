@@ -1,6 +1,9 @@
 {
     "name": "@fullstacked/tailwindcss",
     "version": "0.0.0",
+    "scripts": {
+        "build": "esbuild --outfile=index.js index.ts"
+    },
     "dependencies": {
         "lightningcss-wasm": "^1.32.0",
         "oxide-wasm": "^0.1.1",
