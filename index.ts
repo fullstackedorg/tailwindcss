@@ -108,7 +108,7 @@ async function loadStylesheet(id: string, base: string) {
     throw new Error(`The browser build does not support @import for "${id}"`);
 }
 
-export async function compileTailwind(
+async function compileTailwind(
     entryfile: string,
     files: string[]
 ): Promise<string> {
@@ -136,7 +136,7 @@ export async function compileTailwind(
         : new TextDecoder().decode(result);
 }
 
-export async function tailwindBuilder(params: {
+async function tailwindBuilder(params: {
     resolved: {
         importer: string;
     }[];
@@ -159,16 +159,6 @@ export async function tailwindBuilder(params: {
             contents: css
         }
     ];
-}
-
-export async function build(
-    entryfile: string,
-    outfile: string,
-    files: string[]
-) {
-    const css = await compileTailwind(entryfile, files);
-    if (!css) return;
-    return fs.promises.writeFile(outfile, css);
 }
 
 export const pluginTailwindcss = {
