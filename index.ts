@@ -8,7 +8,6 @@ let init: {
     oxide: Promise<void>;
     lightningcss: Promise<void>;
     tailwindcss: string;
-    baseDirectory: string;
     skipLightning: boolean;
 } = null;
 let initPromise: Promise<void> = null;
@@ -17,7 +16,6 @@ type InitializeOpts = {
     oxide?: string;
     tailwindcss?: string;
     lightningcss?: string;
-    baseDirectory?: string;
     skipLightning?: boolean;
 };
 
@@ -36,7 +34,6 @@ export function initialize(opts?: InitializeOpts) {
                 oxide: oxide(fs.promises.readFile(oxidePath)),
                 lightningcss: lightningcss(lightningcssPath),
                 tailwindcss: tailwindcssPath,
-                baseDirectory: opts?.baseDirectory || process.cwd(),
                 skipLightning: opts?.skipLightning
             };
 
@@ -112,12 +109,10 @@ async function compileTailwind(
     entryfile: string,
     files: string[]
 ): Promise<string> {
-    entryfile = path.join(init.baseDirectory, entryfile);
-
     const entry = await fs.promises.readFile(entryfile, "utf-8");
     const contents = await Promise.all(
         files.map((file) =>
-            fs.promises.readFile(path.join(init.baseDirectory, file), "utf-8")
+            fs.promises.readFile(file, "utf-8")
         )
     );
     const candidate = contents.map((content) => extract(content)).flat();
@@ -148,10 +143,12 @@ async function tailwindBuilder(params: {
         return [];
     }
 
-    const sources = params.sources.filter((s) => !s.endsWith(".css"));
+    const sources = params.sources
+        .filter((s) => !s.endsWith(".css"));
     await initialize(params.initializeOptions);
-    const css = await compileTailwind(params.resolved.at(0).importer, sources);
-    const basename = path.basename(params.resolved.at(0).importer);
+    const entryfile = params.resolved.at(0).importer;
+    const css = await compileTailwind(entryfile, sources);
+    const basename = path.basename(entryfile);
 
     return [
         {
