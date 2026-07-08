@@ -1,9 +1,10 @@
 {
     "name": "@fullstacked/tailwindcss",
-    "version": "4.3.2-patch.2",
+    "version": "4.3.2-patch.3",
     "main": "index.js",
     "scripts": {
-        "build": "esbuild --outfile=index.js index.ts"
+        "build": "esbuild --outfile=index.js index.ts",
+        "prepack": "npm run build"
     },
     "dependencies": {
         "lightningcss-wasm": "^1.32.0",
