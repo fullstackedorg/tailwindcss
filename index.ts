@@ -19,7 +19,10 @@ type InitializeOpts = {
     skipLightning?: boolean;
 };
 
-function findNodeModulesPath(subPath: string, currentDir: string = process.cwd()): string {
+function findNodeModulesPath(
+    subPath: string,
+    currentDir: string = process.cwd()
+): string {
     const checkPath = path.join(currentDir, "node_modules", subPath);
     if (fs.existsSync(checkPath)) {
         return checkPath;
@@ -31,7 +34,10 @@ function findNodeModulesPath(subPath: string, currentDir: string = process.cwd()
             return found;
         }
     }
-    if (currentDir === process.cwd() && typeof import.meta.dirname === "string") {
+    if (
+        currentDir === process.cwd() &&
+        typeof import.meta.dirname === "string"
+    ) {
         const found = findNodeModulesPath(subPath, import.meta.dirname);
         if (fs.existsSync(found)) {
             return found;
@@ -44,7 +50,8 @@ export function initialize(opts?: InitializeOpts) {
     if (init === null) {
         initPromise = new Promise(async (resolve) => {
             const oxidePath =
-                opts?.oxide || findNodeModulesPath("oxide-wasm/pkg/oxide_wasm_bg.wasm");
+                opts?.oxide ||
+                findNodeModulesPath("oxide-wasm/pkg/oxide_wasm_bg.wasm");
             const lightningcssPath =
                 opts?.lightningcss ||
                 findNodeModulesPath("lightningcss-wasm/lightningcss_node.wasm");
@@ -141,9 +148,9 @@ async function compileTailwind(
     const result = init.skipLightning
         ? css
         : transform({
-            filename: "input.css",
-            code: new TextEncoder().encode(css)
-        }).code;
+              filename: "input.css",
+              code: new TextEncoder().encode(css)
+          }).code;
 
     return typeof result === "string"
         ? result
