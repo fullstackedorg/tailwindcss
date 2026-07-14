@@ -19,16 +19,37 @@ type InitializeOpts = {
     skipLightning?: boolean;
 };
 
+function findNodeModulesPath(subPath: string, currentDir: string = process.cwd()): string {
+    const checkPath = path.join(currentDir, "node_modules", subPath);
+    if (fs.existsSync(checkPath)) {
+        return checkPath;
+    }
+    const parentDir = path.dirname(currentDir);
+    if (parentDir !== currentDir) {
+        const found = findNodeModulesPath(subPath, parentDir);
+        if (fs.existsSync(found)) {
+            return found;
+        }
+    }
+    if (currentDir === process.cwd() && typeof import.meta.dirname === "string") {
+        const found = findNodeModulesPath(subPath, import.meta.dirname);
+        if (fs.existsSync(found)) {
+            return found;
+        }
+    }
+    return checkPath;
+}
+
 export function initialize(opts?: InitializeOpts) {
     if (init === null) {
         initPromise = new Promise(async (resolve) => {
             const oxidePath =
-                opts?.oxide || "node_modules/oxide-wasm/pkg/oxide_wasm_bg.wasm";
+                opts?.oxide || findNodeModulesPath("oxide-wasm/pkg/oxide_wasm_bg.wasm");
             const lightningcssPath =
                 opts?.lightningcss ||
-                "node_modules/lightningcss-wasm/lightningcss_node.wasm";
+                findNodeModulesPath("lightningcss-wasm/lightningcss_node.wasm");
             const tailwindcssPath =
-                opts?.tailwindcss || "node_modules/tailwindcss";
+                opts?.tailwindcss || findNodeModulesPath("tailwindcss");
 
             const locations: typeof init = {
                 oxide: oxide(fs.promises.readFile(oxidePath)),
@@ -120,9 +141,9 @@ async function compileTailwind(
     const result = init.skipLightning
         ? css
         : transform({
-              filename: "input.css",
-              code: new TextEncoder().encode(css)
-          }).code;
+            filename: "input.css",
+            code: new TextEncoder().encode(css)
+        }).code;
 
     return typeof result === "string"
         ? result
