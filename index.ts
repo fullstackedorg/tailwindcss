@@ -139,7 +139,11 @@ async function compileTailwind(
 ): Promise<string> {
     const entry = await fs.promises.readFile(entryfile, "utf-8");
     const contents = await Promise.all(
-        files.map((file) => fs.promises.readFile(file, "utf-8"))
+        files.map(async (file) => {
+            try {
+                return await fs.promises.readFile(file, "utf-8")
+            } catch { return "" }
+        })
     );
     const candidate = contents.map((content) => extract(content)).flat();
     const compiler = await compile(entry, { loadStylesheet });
@@ -148,9 +152,9 @@ async function compileTailwind(
     const result = init.skipLightning
         ? css
         : transform({
-              filename: "input.css",
-              code: new TextEncoder().encode(css)
-          }).code;
+            filename: "input.css",
+            code: new TextEncoder().encode(css)
+        }).code;
 
     return typeof result === "string"
         ? result
