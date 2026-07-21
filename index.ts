@@ -27,7 +27,7 @@ function findNodeModulesPath(
     if (fs.existsSync(checkPath)) {
         return checkPath;
     }
-    
+
     const parentDir = path.dirname(currentDir);
     if (parentDir !== currentDir) {
         return findNodeModulesPath(subPath, parentDir);
@@ -65,11 +65,12 @@ export function initialize(opts?: InitializeOpts) {
             const tailwindcssPath =
                 opts?.tailwindcss || findNodeModulesPath("tailwindcss");
 
-            const [oxideExists, lightningcssExists, tailwindcssExists] = await Promise.all([
-                ensureExists(oxidePath),
-                ensureExists(lightningcssPath),
-                ensureExists(tailwindcssPath)
-            ]);
+            const [oxideExists, lightningcssExists, tailwindcssExists] =
+                await Promise.all([
+                    ensureExists(oxidePath),
+                    ensureExists(lightningcssPath),
+                    ensureExists(tailwindcssPath)
+                ]);
 
             if (!oxideExists) {
                 reject(new Error("oxide_wasm_bg.wasm not found"));
@@ -182,9 +183,9 @@ async function compileTailwind(
     const result = init.skipLightning
         ? css
         : transform({
-            filename: "input.css",
-            code: new TextEncoder().encode(css)
-        }).code;
+              filename: "input.css",
+              code: new TextEncoder().encode(css)
+          }).code;
 
     return typeof result === "string"
         ? result
