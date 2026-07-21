@@ -1,15 +1,15 @@
 {
     "name": "@fullstacked/tailwindcss",
-    "version": "4.3.2-patch.5",
+    "version": "4.3.3",
     "main": "index.js",
     "scripts": {
         "build": "esbuild --outfile=index.js index.ts",
         "prepack": "npm run build"
     },
     "dependencies": {
-        "lightningcss-wasm": "^1.32.0",
+        "lightningcss-wasm": "^1.33.0",
         "oxide-wasm": "^0.1.1",
-        "tailwindcss": "^4.3.2"
+        "tailwindcss": "^4.3.3"
     },
     "type": "module",
     "devDependencies": {
