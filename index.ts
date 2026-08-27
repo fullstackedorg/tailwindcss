@@ -19,9 +19,12 @@ type InitializeOpts = {
     skipLightning?: boolean;
 };
 
+const currentFileLocation = new URL(import.meta.url).pathname;
+const currentRelToCwd = path.relative(process.cwd(), currentFileLocation);
+
 function findNodeModulesPath(
     subPath: string,
-    currentDir: string = process.cwd()
+    currentDir: string = currentRelToCwd
 ): string {
     const checkPath = path.join(currentDir, "node_modules", subPath);
     if (fs.existsSync(checkPath)) {
@@ -183,9 +186,9 @@ async function compileTailwind(
     const result = init.skipLightning
         ? css
         : transform({
-              filename: "input.css",
-              code: new TextEncoder().encode(css)
-          }).code;
+            filename: "input.css",
+            code: new TextEncoder().encode(css)
+        }).code;
 
     return typeof result === "string"
         ? result
