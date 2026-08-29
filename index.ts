@@ -186,9 +186,9 @@ async function compileTailwind(
     const result = init.skipLightning
         ? css
         : transform({
-            filename: "input.css",
-            code: new TextEncoder().encode(css)
-        }).code;
+              filename: "input.css",
+              code: new TextEncoder().encode(css)
+          }).code;
 
     return typeof result === "string"
         ? result
