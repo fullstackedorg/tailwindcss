@@ -1,2 +1,7 @@
 index.js
 node_modules
+test/sample/out
+test/sample/output.css
+test/sample/build/out
+test/sample/build/node_modules
+test/sample/build/project/out
